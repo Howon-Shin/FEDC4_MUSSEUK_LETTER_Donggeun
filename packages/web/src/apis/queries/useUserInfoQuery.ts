@@ -3,11 +3,16 @@ import { baseInstance } from '@/apis/instance';
 import queryKey from '@/apis/queryKeys';
 import { UserResponse } from 'common/types/raws';
 import parseUser from 'common/utils/parseUser';
+import { User } from 'common/types';
 
 export const getUserInfo = async (userId: string) => {
-  const { data } = await baseInstance.get<UserResponse>(`/users/${userId}`);
+  const { data } = await baseInstance.get<UserResponse | User>(`/users/${userId}`);
 
-  return parseUser(data);
+  if ('isOnline' in data) {
+    return parseUser(data);
+  }
+
+  return data;
 };
 
 export const userInfoQueryOption = (userId: string) =>

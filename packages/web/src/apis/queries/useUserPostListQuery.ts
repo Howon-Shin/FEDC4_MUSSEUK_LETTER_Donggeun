@@ -3,11 +3,18 @@ import { baseInstance } from '@/apis/instance';
 import queryKey from '@/apis/queryKeys';
 import { PostResponse } from 'common/types/raws';
 import parsePost from 'common/utils/parsePost';
+import { Post } from 'common/types';
 
 export const getUserPostList = async (userId: string) => {
-  const { data } = await baseInstance.get<PostResponse[]>(`/posts/author/${userId}`);
+  const { data } = await baseInstance.get<(PostResponse | Post)[]>(`/posts/author/${userId}`);
 
-  return data.map((post) => parsePost(post));
+  if (data.length <= 0) return [];
+
+  if ('createdAt' in data[0]) {
+    return data.map((post) => parsePost(post as PostResponse));
+  }
+
+  return data as Post[];
 };
 
 export const userPostListQueryOption = (userId: string) =>
